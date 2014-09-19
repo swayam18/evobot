@@ -1,5 +1,25 @@
 import numpy as np
+import code
 from cv2 import *
+
+TRANS_MATRIX = []
+AFFLINE_MATRIX = []
+
+#set the transformation matrix
+def setTransformationMatrix():
+  pts1 = np.float32([[439,11],[491,9],[323,434],[134,429]])
+  pts2 = np.float32([[0,0], [50,0] , [50,1000], [0,1000]])
+  pts2 = np.float32([[pt[0] + 1804,pt[1]+922] for pt in pts2])
+
+  global TRANS_MATRIX
+  TRANS_MATRIX = getPerspectiveTransform(pts1, pts2)
+
+def setAfflineMatrix():
+  pts1 = np.float32([[1636,1353],[1805,1353],[1805,1561]])
+  pts2 = np.float32([[1.300265,103.780597], [1.300249,103.780578] , [1.300257,103.780582]])
+
+  global AFFLINE_MATRIX
+  AFFLINE_MATRIX = getAffineTransform(pts1, pts2)
 
 #Get the difference between images
 def subtract(current, background,dst="result.jpg"):
@@ -54,6 +74,14 @@ def drawbox(img,contours):
     x,y,w,h = boundingRect(contour)
     rectangle(img,(x,y),(x+w,y+h),(255,0,0),2) 
 
+def map_pixel(location):
+  location.append(1)
+  _location = TRANS_MATRIX.dot(location)
+  transformed_location = [ _location[0]/_location[2], _location[1]/_location[2], 1] 
+  print transformed_location
+  gps_location = AFFLINE_MATRIX.dot(transformed_location) 
+  print gps_location
+
 def track_loop():
   previous = imread("0.jpg",0)
   current = imread("1.jpg",0)
@@ -86,5 +114,11 @@ def track():
   drawbox(current,contours)
   imwrite("tracked.jpg",current)
 
-track()
+def temp_test():
+  setTransformationMatrix()
+  setAfflineMatrix()
+  map_pixel([388, 82])
+
+#track()
+temp_test()
 c = waitKey(0)
