@@ -67,7 +67,7 @@ def imcenters(contours):
   for contour in contours:
     M = moments(contour)
     location =  M['m10']/M['m00'],M['m01']/M['m00']
-    print "Location:",location
+    print "Location:", map_pixel(location)
 
 def drawbox(img,contours):
   for contour in contours:
@@ -117,7 +117,7 @@ def track():
 def temp_test():
   setTransformationMatrix()
   setAfflineMatrix()
-  map_pixel([388, 82])
+  map_pixel([87, 73])
 
 #track()
 temp_test()
