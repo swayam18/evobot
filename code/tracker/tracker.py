@@ -29,16 +29,16 @@ def threshmap(im1,im2,th_min = 20 , th_max = 230):
 def imfilter(thmap):
   # First, use median filter
   dst = medianBlur(thmap,3)
-  imwrite("median.jpg", dst)
+  #imwrite("median.jpg", dst)
   # Then, define kernel and apply a morphological open
   kernel = getStructuringElement(MORPH_RECT,(3,3))
   e_dst = erode(dst,kernel)
   de_dst = dilate(e_dst,kernel)
 
-  imwrite("result.jpg", de_dst)
+  #imwrite("result.jpg", de_dst)
   return de_dst
 
-def contours(img):
+def imcontours(img):
   contours,hierarchy= findContours(img,RETR_TREE,CHAIN_APPROX_SIMPLE)
   hierarchy = hierarchy[0]      #Extra Dimension Removal!
   return(contours, hierarchy)
@@ -46,25 +46,45 @@ def contours(img):
 def imcenters(contours):
   for contour in contours:
     M = moments(contour)
-    print "Location:",M['m10']/M['m00'],M['m01']/M['m00']
+    location =  M['m10']/M['m00'],M['m01']/M['m00']
+    print "Location:",location
 
 def drawbox(img,contours):
   for contour in contours:
     x,y,w,h = boundingRect(contour)
     rectangle(img,(x,y),(x+w,y+h),(255,0,0),2) 
-  imshow("Result",img) 
 
+def track_loop():
+  previous = imread("0.jpg",0)
+  current = imread("1.jpg",0)
+  future = imread("2.jpg",0)
+  s1 = subtract(current,previous)
+  s2 = subtract(future,current)
+  for i in range(2,23):
+    previous = current;
+    current = future;
+    future = imread("sample/{}.jpg".format(i+1),0)
+    s1 = s2
+    s2 = subtract(future,current)
+    thmap = threshmap(s1,s2)
+    result = imfilter(thmap)
+    contours = imcontours(result)[0] #get contour
+    imcenters(contours)
+    drawbox(current,contours)
+    imwrite("tracked/tracked{}.jpg".format(i),current)
 
-previous = imread("0.jpg",0)
-current = imread("1.jpg",0)
-future = imread("2.jpg",0)
+def track():
+  previous = imread("0.jpg",0)
+  current = imread("1.jpg",0)
+  future = imread("2.jpg",0)
+  s1 = subtract(current,previous)
+  s2 = subtract(future,current)
+  thmap = threshmap(s1,s2)
+  result = imfilter(thmap)
+  contours = imcontours(result)[0]
+  imcenters(contours)
+  drawbox(current,contours)
+  imwrite("tracked.jpg",current)
 
-s1 = subtract(current,previous,dst="s1.jpg")
-s2 = subtract(future,current,dst="s2.jpg")
-thmap = threshmap(s1,s2)
-result = imfilter(thmap)
-contours = contours(result)[0]
-imcenters(contours)
-drawbox(current,contours)
-
+track()
 c = waitKey(0)
