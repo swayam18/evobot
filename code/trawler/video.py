@@ -32,8 +32,8 @@ def subtract(current, background,dst="result.jpg"):
   return subtracted
 
 def fast_threshmap(im1, im2):
-  r, thresh1 = threshold(im1,30,255,THRESH_BINARY)
-  r, thresh2 = threshold(im2,30,255,THRESH_BINARY)
+  r, thresh1 = threshold(im1,50,255,THRESH_BINARY)
+  r, thresh2 = threshold(im2,50,255,THRESH_BINARY)
 
   return bitwise_or(thresh1, thresh2)
   
