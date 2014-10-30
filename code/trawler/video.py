@@ -26,10 +26,17 @@ def setAfflineMatrix():
 
 #Get the difference between images
 def subtract(current, background,dst="result.jpg"):
-  subtracted = np.absolute(np.subtract(current,background))
+  #subtracted = np.absolute(np.subtract(current,background))
+  subtracted = absdiff(current, background)
   #imwrite(dst, subtracted)
   return subtracted
 
+def fast_threshmap(im1, im2):
+  r, thresh1 = threshold(im1,30,255,THRESH_BINARY)
+  r, thresh2 = threshold(im2,30,255,THRESH_BINARY)
+
+  return bitwise_or(thresh1, thresh2)
+  
 # Construct a threshmap
 def threshmap(im1,im2,th_min = 20 , th_max = 230):
   out = []
@@ -99,7 +106,6 @@ def track_loop():
         jpg = bytes[a:b+2]
         bytes= bytes[b+2:]
         i = imdecode(np.fromstring(jpg, dtype=np.uint8),0)
-        print 'here'
         future = i
         if previous == None or current == None or future == None:
           pass
@@ -107,7 +113,7 @@ def track_loop():
           s1 = subtract(current,previous)
           s2 = subtract(future,current)
 
-          thmap = threshmap(s1,s2)
+          thmap = fast_threshmap(s1,s2)
           result = imfilter(thmap)
           imshow('i',result)
           if waitKey(1) ==27:
