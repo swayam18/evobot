@@ -69,15 +69,18 @@ def imfilter(thmap):
   return de_dst
 
 def imcontours(img):
-  contours,hierarchy= findContours(img,RETR_TREE,CHAIN_APPROX_SIMPLE)
-  hierarchy = hierarchy[0]      #Extra Dimension Removal!
-  return(contours, hierarchy)
+  try:
+    contours,hierarchy= findContours(img,RETR_TREE,CHAIN_APPROX_SIMPLE)
+    return contours
+  except TypeError:
+    return None
   
 def imcenters(contours):
   for contour in contours:
     M = moments(contour)
     location =  M['m10']/M['m00'],M['m01']/M['m00']
-    print "Location:", map_pixel(location)
+    #print "Location:", map_pixel(location)
+    print "Location:", location
 
 def drawbox(img,contours):
   for contour in contours:
@@ -115,14 +118,15 @@ def track_loop():
 
           thmap = fast_threshmap(s1,s2)
           result = imfilter(thmap)
-          imshow('i',result)
+
+          contours = imcontours(result) #get contour
+          if contours != None:
+            imcenters(contours)
+            drawbox(current,contours)
+
+          imshow('i',current)
           if waitKey(1) ==27:
             exit(0)
-
-          #contours = imcontours(result)[0] #get contour
-          #imcenters(contours)
-          #drawbox(current,contours)
-          #imwrite("tracked_new/tracked_{}.jpg".format(time.time),current)
 
         previous = current
         current = future
