@@ -119,14 +119,18 @@ def getPositions(frames=1):
   #print "success rate:", hits*1.0/(hits+misses)*100,"%"
   return hits, misses, hits*1.0/(hits+misses)*100, hits+misses
 
-x = []
-y = []
-for i in range(1,100): 
-  data = getPositions(i)
-  x.append(120.0/i)
-  y.append(data[2])
-  
-plt.plot(x,y)
-plt.ylabel('Tracking Accuracy')
-plt.xlabel('FPS') 
-plt.show()
+def testaccuracy():
+  x = []
+  y = []
+
+  for i in range(1,100): 
+    data = getPositions(i)
+    x.append(120.0/i)
+    y.append(data[2])
+    
+  plt.plot(x,y)
+  plt.ylabel('Tracking Accuracy')
+  plt.xlabel('FPS') 
+  plt.show()
+
+print getPositions(6)

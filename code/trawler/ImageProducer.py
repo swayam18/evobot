@@ -10,6 +10,10 @@ class ImageProducer:
     self.url = "http://192.168.28.219/snapshot.cgi"
     self.storage = "snapshots/"
 
+    self.root = 'http://192.168.28.102'
+    self.url = "http://192.168.28.102/image/jpeg.cgi"
+    self.storage = "snapshots/"
+
   # Perfom HTTP basic auth
   def authenticate(self):
     username = 'admin'

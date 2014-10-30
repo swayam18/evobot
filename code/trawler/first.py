@@ -4,10 +4,14 @@ from cStringIO import StringIO
 import PIL.Image as pil
 import numpy
 
-url = "http://192.168.28.219/snapshot.cgi"
+#url = "http://192.168.28.219/snapshot.cgi"
+url = "http://192.168.28.102/image/jpeg.cgi" # trendnet
+
+# username = 'admin'
+# password = ''
 
 username = 'admin'
-password = ''
+password = 'sutd1234' # trendnet
 
 p = urllib2.HTTPPasswordMgrWithDefaultRealm()
 p.add_password(None, url, username, password)
