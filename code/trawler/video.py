@@ -56,12 +56,12 @@ def threshmap(im1,im2,th_min = 20 , th_max = 230):
   return out
 
 # Improve the object recognized by threshmap using filters
+kernel = getStructuringElement(MORPH_RECT,(3,3))
 def imfilter(thmap):
   # First, use median filter
   dst = medianBlur(thmap,3)
   #imwrite("median.jpg", dst)
   # Then, define kernel and apply a morphological open
-  kernel = getStructuringElement(MORPH_RECT,(3,3))
   e_dst = erode(dst,kernel)
   de_dst = dilate(e_dst,kernel)
 
