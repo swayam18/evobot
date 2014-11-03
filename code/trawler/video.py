@@ -6,6 +6,7 @@ import time
 import kmeans
 import copy
 import time
+import manager
 
 # This code works perfectly!
 
@@ -136,57 +137,70 @@ def map_pixel(location):
   gps_location = AFFLINE_MATRIX.dot(transformed_location) 
   print gps_location
 
+# looks at frames means and evaluates robot positions
+def getLocation(prev,mu): 
+  q = [ manager.Point(x,y) for x,y in mu]
+  if prev == None: 
+    print "Initial Points:", len(q)
+    return q
+  else:
+    return manager.map_points(prev,q) 
+
 def track_loop():
   stream=urllib.urlopen('http://192.168.28.102/mjpeg.cgi')
   codec = cv.CV_FOURCC('M','J','P','G')
   video = VideoWriter()
   filename = "recording_%d"%int(time.time())
-  video.open(filename, codec, 24, (640,480),False)
+  #video.open(filename, codec, 24, (640,480),False)
   bytes=''
   previous = None
   current = None
   future = None
+  prev_locations = None
   while True:
-      bytes+=stream.read(1024)
-      a = bytes.find('\xff\xd8')
-      b = bytes.find('\xff\xd9')
-      if a!=-1 and b!=-1:
-        jpg = bytes[a:b+2]
-        bytes= bytes[b+2:]
-        i = imdecode(np.fromstring(jpg, dtype=np.uint8),0)
-        future = i
-        if previous == None or current == None or future == None:
-          pass
-        else:
-          s1 = subtract(current,previous)
-          s2 = subtract(future,current)
+    bytes+=stream.read(1024)
+    a = bytes.find('\xff\xd8')
+    b = bytes.find('\xff\xd9')
+    if a!=-1 and b!=-1:
+      jpg = bytes[a:b+2]
+      bytes= bytes[b+2:]
+      i = imdecode(np.fromstring(jpg, dtype=np.uint8),0)
+      future = i
+      if previous == None or current == None or future == None:
+        pass
+      else:
+        s1 = subtract(current,previous)
+        s2 = subtract(future,current)
 
-          thmap = fast_threshmap(s1,s2)
-          result = imfilter(thmap)
+        thmap = fast_threshmap(s1,s2)
+        result = imfilter(thmap)
 
-          contours = imcontours(result) #get contour
-          current_copy = copy.copy(current)
-          if len(contours) != 0:
-            #imcenters(contours)
-            #drawbox(current_copy,contours)
-            mu, clusters = means(contours) 
-            if len(mu):
-              for i,m in enumerate(mu):
-                m = tuple(map(int, m))
-                points = clusters[i]
-                circle(current_copy,m,20,(255))
-                for p in points:
-                  p = tuple(map(int, p))
-                  circle(current_copy,p,2,(255))
+        contours = imcontours(result) #get contour
+        current_copy = copy.copy(current)
+        if len(contours) != 0:
+          #imcenters(contours)
+          #drawbox(current_copy,contours)
+          mu, clusters = means(contours) 
+          if len(mu):
+            new_locations = getLocation(prev_locations,mu)
+            print new_locations
+            prev_locations = new_locations
+            for i,m in enumerate(mu):
+              m = tuple(map(int, m))
+              points = clusters[i]
+              circle(current_copy,m,20,(255))
+              for p in points:
+                p = tuple(map(int, p))
+                circle(current_copy,p,2,(255))
 
-          imshow('o',result)
-          imshow('i',current_copy)
-          video.write(current_copy)
-          if waitKey(1) ==27:
-            exit(0)
+        imshow('o',result)
+        imshow('i',current_copy)
+        #video.write(current_copy)
+        if waitKey(1) ==27:
+          exit(0)
 
-        previous = current
-        current = future
+      previous = current
+      current = future
 
 def track():
   previous = imread("0.jpg",0)

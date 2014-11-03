@@ -1,0 +1,3 @@
+DBSCAN values:
+eps: 70
+min_samples: 7
