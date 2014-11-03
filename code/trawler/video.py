@@ -141,7 +141,7 @@ def map_pixel(location):
 def getLocation(prev,mu): 
   q = [ manager.Point(x,y) for x,y in mu]
   if prev == None: 
-    print "Initial Points:", len(q)
+    q = [manager.Point(0,0), manager.Point(100,100)]
     return q
   else:
     return manager.map_points(prev,q) 
@@ -183,15 +183,20 @@ def track_loop():
           mu, clusters = means(contours) 
           if len(mu):
             new_locations = getLocation(prev_locations,mu)
-            print new_locations
             prev_locations = new_locations
             for i,m in enumerate(mu):
               m = tuple(map(int, m))
               points = clusters[i]
-              circle(current_copy,m,20,(255))
+              #circle(current_copy,m,20,(255))
               for p in points:
                 p = tuple(map(int, p))
                 circle(current_copy,p,2,(255))
+
+        if prev_locations != None:
+          l1 = tuple(map(int,prev_locations[0]))
+          l2 = tuple(map(int,prev_locations[1]))
+          circle(current_copy,l1,20,(255,0,0))
+          circle(current_copy,l2,20,(0,255,0))
 
         imshow('o',result)
         imshow('i',current_copy)

@@ -18,6 +18,9 @@ class Point:
   def __str__(self):
     return "%f,%f" % (self.x, self.y)
 
+  def __iter__(self):
+    return iter([self.x,self.y])
+
 
 def construct_matrix(p,q,sq=False):
   distance_matrix = []
@@ -32,14 +35,16 @@ def construct_matrix(p,q,sq=False):
 # Given a matrix
 # It finds the indices of the minimum element
 def small(matrix):
-  k,l = None,None
-  small = None 
+  k,l = -1,-1
+  smallest = None 
   for i in range(len(matrix)):
     for j in range(len(matrix[i])):
-      if matrix[i][j] == None: continue
-      if small == None or matrix[i][j] < small:
-        small = matrix[i][j]
-        k,l = i,j
+      if matrix[i][j] == None: 
+        continue
+      elif smallest == None or matrix[i][j] < smallest:
+        k = i
+        l = j
+        smallest = matrix[i][j]
   return k,l
 
 # Given a vector P and a vector Q
@@ -52,6 +57,7 @@ def map_points(p,q):
   dm = construct_matrix(p,q)
   for i in range(len(dm)):
     k,l = small(dm) 
+    if k == -1 and l == -1: continue
     r[k] = q[l]
     #print k,l,dm[k][l]
     # Remove options k and l from the matrix.
@@ -82,13 +88,13 @@ def map_points_dp(p,q):
   pass
   
 
-p = [ Point(-i+5,i+5) for i in range(0,3)]
-q = [ Point(i,-i) for i in range(0,3)]
+#p = [ Point(-i+5,i+5) for i in range(0,3)]
+#q = [ Point(i,-i) for i in range(0,3)]
 
-dm = construct_matrix(p,q)
-r = map_points(p,q)
-print p
-print r
+#dm = construct_matrix(p,q)
+#r = map_points(p,q)
+#print p
+#print r
 
 def getPositions(frames=1):
   p = []
