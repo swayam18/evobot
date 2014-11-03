@@ -106,7 +106,7 @@ def means(contours):
       print 'ZERO!'
   if len(X):
     #mu, clusters = kmeans.find_centers(X,ROBOTS_COUNT)
-    db = DBSCAN(eps=70, min_samples =7).fit(np.asarray(X))
+    db = DBSCAN(eps=50, min_samples =7).fit(np.asarray(X))
     labels = db.labels_
     clusters = cluster_points(X,labels)
     means = kmeans.reevaluate_centers(None, clusters)
@@ -151,7 +151,7 @@ def track_loop():
   codec = cv.CV_FOURCC('M','J','P','G')
   video = VideoWriter()
   filename = "recording_%d"%int(time.time())
-  #video.open(filename, codec, 24, (640,480),False)
+  video.open(filename, codec, 24, (640,480),False)
   bytes=''
   previous = None
   current = None
@@ -200,7 +200,7 @@ def track_loop():
 
         imshow('o',result)
         imshow('i',current_copy)
-        #video.write(current_copy)
+        video.write(current_copy)
         if waitKey(1) ==27:
           exit(0)
 
