@@ -2,11 +2,14 @@ from cv2 import *
 import urllib 
 import numpy as np
 import time
+import copy
+import kmeans
 
 # This code works perfectly!
 
 TRANS_MATRIX = []
 AFFLINE_MATRIX = []
+ROBOTS_COUNT = 1
 
 #set the transformation matrix
 def setTransformationMatrix():
@@ -32,8 +35,8 @@ def subtract(current, background,dst="result.jpg"):
   return subtracted
 
 def fast_threshmap(im1, im2):
-  r, thresh1 = threshold(im1,50,255,THRESH_BINARY)
-  r, thresh2 = threshold(im2,50,255,THRESH_BINARY)
+  r, thresh1 = threshold(im1,40,255,THRESH_BINARY)
+  r, thresh2 = threshold(im2,40,255,THRESH_BINARY)
 
   return bitwise_or(thresh1, thresh2)
   
@@ -75,12 +78,29 @@ def imcontours(img):
   except TypeError:
     return None
   
-def imcenters(contours):
+def means(contours):
+  X = []
   for contour in contours:
     M = moments(contour)
-    location =  M['m10']/M['m00'],M['m01']/M['m00']
-    #print "Location:", map_pixel(location)
-    print "Location:", location
+    try:
+      X.append((M['m10']/M['m00'],M['m01']/M['m00']))
+    except ZeroDivisionError:
+      print 'ZERO!'
+  if len(X):
+    mu, clusters = kmeans.find_centers(X,ROBOTS_COUNT)
+    return mu, clusters
+  return None, None
+  
+def imcenters(contours):
+  print "Number of Robots Detected:",len(contours)
+  for contour in contours:
+    M = moments(contour)
+    try:
+      location =  M['m10']/M['m00'],M['m01']/M['m00']
+      #print "Location:", map_pixel(location)
+      print "Location:", location
+    except ZeroDivisionError:
+      print 'ZERO!'
 
 def drawbox(img,contours):
   for contour in contours:
@@ -120,11 +140,17 @@ def track_loop():
           result = imfilter(thmap)
 
           contours = imcontours(result) #get contour
-          if contours != None:
-            imcenters(contours)
-            drawbox(current,contours)
+          current_copy = copy.copy(current)
+          if len(contours) != 0:
+            #imcenters(contours)
+            #drawbox(current_copy,contours)
+            mu, clusters = means(contours) 
+            if mu != None:
+              mu[0] = tuple(map(int, mu[0]))
+              circle(current_copy,mu[0],20,(255))
 
-          imshow('i',current)
+          imshow('o',result)
+          imshow('i',current_copy)
           if waitKey(1) ==27:
             exit(0)
 
