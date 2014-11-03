@@ -105,7 +105,7 @@ def means(contours):
       print 'ZERO!'
   if len(X):
     #mu, clusters = kmeans.find_centers(X,ROBOTS_COUNT)
-    db = DBSCAN(eps=20, min_samples =3).fit(np.asarray(X))
+    db = DBSCAN(eps=70, min_samples =7).fit(np.asarray(X))
     labels = db.labels_
     clusters = cluster_points(X,labels)
     means = kmeans.reevaluate_centers(None, clusters)
@@ -171,12 +171,13 @@ def track_loop():
             #drawbox(current_copy,contours)
             mu, clusters = means(contours) 
             if len(mu):
-              mu[0] = tuple(map(int, mu[0]))
-              points = clusters[0]
-              circle(current_copy,mu[0],20,(255))
-              for p in points:
-                p = tuple(map(int, p))
-                circle(current_copy,p,2,(255))
+              for i,m in enumerate(mu):
+                m = tuple(map(int, m))
+                points = clusters[i]
+                circle(current_copy,m,20,(255))
+                for p in points:
+                  p = tuple(map(int, p))
+                  circle(current_copy,p,2,(255))
 
           imshow('o',result)
           imshow('i',current_copy)
