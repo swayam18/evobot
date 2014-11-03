@@ -1,15 +1,16 @@
 from cv2 import *
+from sklearn.cluster import DBSCAN
 import urllib 
 import numpy as np
 import time
-import copy
 import kmeans
+import copy
 
 # This code works perfectly!
 
 TRANS_MATRIX = []
 AFFLINE_MATRIX = []
-ROBOTS_COUNT = 1
+ROBOTS_COUNT = 2
 
 #set the transformation matrix
 def setTransformationMatrix():
@@ -78,8 +79,23 @@ def imcontours(img):
   except TypeError:
     return None
   
+#removes noise
+def cluster_points(X,labels):
+  clusters = {}
+  for i in range(len(X)):
+    x = X[i]
+    c = labels[i]
+    if c == -1: continue
+    if c in clusters:
+      clusters[c].append(x)
+    else:
+      clusters[c] = [x]
+  return clusters
+
 def means(contours):
   X = []
+  means = []
+  clusters = {}
   for contour in contours:
     M = moments(contour)
     try:
@@ -87,9 +103,13 @@ def means(contours):
     except ZeroDivisionError:
       print 'ZERO!'
   if len(X):
-    mu, clusters = kmeans.find_centers(X,ROBOTS_COUNT)
-    return mu, clusters
-  return None, None
+    #mu, clusters = kmeans.find_centers(X,ROBOTS_COUNT)
+    db = DBSCAN(eps=15, min_samples =3).fit(np.asarray(X))
+    labels = db.labels_
+    clusters = cluster_points(X,labels)
+    means = kmeans.reevaluate_centers(None, clusters)
+    
+  return means, clusters
   
 def imcenters(contours):
   print "Number of Robots Detected:",len(contours)
@@ -145,9 +165,13 @@ def track_loop():
             #imcenters(contours)
             #drawbox(current_copy,contours)
             mu, clusters = means(contours) 
-            if mu != None:
+            if len(mu):
               mu[0] = tuple(map(int, mu[0]))
+              points = clusters[0]
               circle(current_copy,mu[0],20,(255))
+              for p in points:
+                p = tuple(map(int, p))
+                circle(current_copy,p,2,(255))
 
           imshow('o',result)
           imshow('i',current_copy)
