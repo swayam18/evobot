@@ -147,11 +147,13 @@ def getLocation(prev,mu):
     return manager.map_points(prev,q) 
 
 def track_loop():
-  stream=urllib.urlopen('http://192.168.28.102/mjpeg.cgi')
+  #stream=urllib.urlopen('http://192.168.1.1/mjpeg.cgi')
+  stream=urllib.urlopen('http://192.168.0.100/mjpeg.cgi')
+  #stream=urllib.urlopen('http://71913554.cam.trendnetcloud.com/mjpeg.cgi')
   codec = cv.CV_FOURCC('M','J','P','G')
-  video = VideoWriter()
+  #video = VideoWriter()
   filename = "recording_%d"%int(time.time())
-  video.open(filename, codec, 24, (640,480),False)
+  #video.open(filename, codec, 24, (640,480),False)
   bytes=''
   previous = None
   current = None
@@ -200,7 +202,7 @@ def track_loop():
 
         imshow('o',result)
         imshow('i',current_copy)
-        video.write(current_copy)
+        #video.write(current_copy)
         if waitKey(1) ==27:
           exit(0)
 
