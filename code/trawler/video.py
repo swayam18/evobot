@@ -8,6 +8,9 @@ import copy
 import time
 import manager
 import proxy
+import socket
+
+socket.setdefaulttimeout(5.0)
 
 # This code works perfectly!
 
@@ -149,8 +152,10 @@ def getLocation(prev,mu):
 
 def track_loop():
   #stream=urllib.urlopen('http://192.168.1.1/mjpeg.cgi')
-  stream=urllib.urlopen('http://192.168.0.100/mjpeg.cgi')
+  #stream=urllib.urlopen('http://192.168.0.100/mjpeg.cgi')
   #stream=urllib.urlopen('http://71913554.cam.trendnetcloud.com/mjpeg.cgi')
+  print 'opening'
+  stream=urllib.urlopen('http://192.168.28.102/mjpeg.cgi')
   codec = cv.CV_FOURCC('M','J','P','G')
   #video = VideoWriter()
   filename = "recording_%d"%int(time.time())
@@ -162,61 +167,74 @@ def track_loop():
   prev_locations = None
   proxy.set_state('prey',1)
   proxy.set_state('predator',1)
-  while True:
-    bytes+=stream.read(1024)
-    if bytes == "": 
-      proxy.set_state('prey',0)
-      proxy.set_state('predator',0)
-      break
-    a = bytes.find('\xff\xd8')
-    b = bytes.find('\xff\xd9')
-    if a!=-1 and b!=-1:
-      jpg = bytes[a:b+2]
-      bytes= bytes[b+2:]
-      i = imdecode(np.fromstring(jpg, dtype=np.uint8),0)
-      future = i
-      if previous == None or current == None or future == None:
-        pass
-      else:
-        s1 = subtract(current,previous)
-        s2 = subtract(future,current)
 
-        thmap = fast_threshmap(s1,s2)
-        result = imfilter(thmap)
+  count = 0
+  try: 
+    while True:
+      bytes+=stream.read(1024)
+      if bytes == "": 
+        proxy.set_state('prey',0)
+        proxy.set_state('predator',0)
+        break
+      a = bytes.find('\xff\xd8')
+      b = bytes.find('\xff\xd9')
+      if a!=-1 and b!=-1:
+        jpg = bytes[a:b+2]
+        bytes= bytes[b+2:]
+        i = imdecode(np.fromstring(jpg, dtype=np.uint8),0)
+        future = i
+        if previous == None or current == None or future == None:
+          pass
+        else:
+          s1 = subtract(current,previous)
+          s2 = subtract(future,current)
 
-        contours = imcontours(result) #get contour
-        current_copy = copy.copy(current)
-        if len(contours) != 0:
-          #imcenters(contours)
-          #drawbox(current_copy,contours)
-          mu, clusters = means(contours) 
-          if len(mu):
-            new_locations = getLocation(prev_locations,mu)
-            prev_locations = new_locations
-            for i,m in enumerate(mu):
-              m = tuple(map(int, m))
-              points = clusters[i]
-              #circle(current_copy,m,20,(255))
-              for p in points:
-                p = tuple(map(int, p))
-                circle(current_copy,p,2,(255))
+          thmap = fast_threshmap(s1,s2)
+          result = imfilter(thmap)
 
-        if prev_locations != None:
-          l1 = tuple(map(int,prev_locations[0]))
-          l2 = tuple(map(int,prev_locations[1]))
-          circle(current_copy,l1,20,(255,0,0))
-          circle(current_copy,l2,20,(0,255,0))
-          proxy.prey_add_location(l1[0],l1[1])
-          proxy.predator_add_location(l2[0],l2[1])
+          contours = imcontours(result) #get contour
+          current_copy = copy.copy(current)
+          if len(contours) != 0:
+            #imcenters(contours)
+            #drawbox(current_copy,contours)
+            mu, clusters = means(contours) 
+            if len(mu):
+              new_locations = getLocation(prev_locations,mu)
+              prev_locations = new_locations
+              for i,m in enumerate(mu):
+                m = tuple(map(int, m))
+                points = clusters[i]
+                #circle(current_copy,m,20,(255))
+                for p in points:
+                  p = tuple(map(int, p))
+                  circle(current_copy,p,2,(255))
 
-        imshow('o',result)
-        imshow('i',current_copy)
-        #video.write(current_copy)
-        if waitKey(1) ==27:
-          exit(0)
+          if prev_locations != None:
+            l1 = tuple(map(int,prev_locations[0]))
+            l2 = tuple(map(int,prev_locations[1]))
+            circle(current_copy,l1,20,(255,0,0))
+            circle(current_copy,l2,20,(0,255,0))
+            if count % 24 == 0:
+              print 'adding'
+              proxy.prey_add_location(l1[0],l1[1])
+              proxy.predator_add_location(l2[0],l2[1])
 
-      previous = current
-      current = future
+          imshow('o',result)
+          imshow('i',current_copy)
+          #video.write(current_copy)
+          if waitKey(1) ==27:
+            exit(0)
+
+        previous = current
+        current = future
+        count+=1
+
+    proxy.set_state('prey',0)
+    proxy.set_state('predator',0)
+  except socket.timeout:
+    print 'Camera Disappeared!'
+    proxy.set_state('prey',0)
+    proxy.set_state('predator',0)
 
 def track():
   previous = imread("0.jpg",0)

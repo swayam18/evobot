@@ -2,8 +2,8 @@ import requests
 import threading
 import cProfile
 
-#root = "http://localhost:3000/robots/"
-root = "http://evobot-proxy.herokuapp.com/robots/"
+root = "http://localhost:3000/robots/"
+#root = "http://evobot-proxy.herokuapp.com/robots/"
 
 def set_state(name, state):
   data = {}
@@ -32,8 +32,9 @@ def put(url,data):
 def post(url,data):
   requests.post(url, json = data)
 
-predator_add_location(415,12)
-predator_add_location(11,12)
-set_state("prey", 1)
-set_state("predator", 1)
-print "done"
+if __name__ == 'main':
+  predator_add_location(415,12)
+  predator_add_location(11,12)
+  set_state("prey", 1)
+  set_state("predator", 1)
+  print "done"
