@@ -34,6 +34,6 @@ def post(url,data):
 
 predator_add_location(415,12)
 predator_add_location(11,12)
-set_state("prey", 2)
-set_state("predator", 5)
+set_state("prey", 1)
+set_state("predator", 1)
 print "done"
