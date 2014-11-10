@@ -42,8 +42,8 @@ def subtract(current, background,dst="result.jpg"):
   return subtracted
 
 def fast_threshmap(im1, im2):
-  r, thresh1 = threshold(im1,40,255,THRESH_BINARY)
-  r, thresh2 = threshold(im2,40,255,THRESH_BINARY)
+  r, thresh1 = threshold(im1,30,255,THRESH_BINARY)
+  r, thresh2 = threshold(im2,30,255,THRESH_BINARY)
 
   return bitwise_or(thresh1, thresh2)
   
@@ -191,6 +191,7 @@ def track_loop():
 
           thmap = fast_threshmap(s1,s2)
           result = imfilter(thmap)
+          imshow('o',result)
 
           contours = imcontours(result) #get contour
           current_copy = copy.copy(current)
@@ -215,14 +216,14 @@ def track_loop():
             circle(current_copy,l1,20,(255,0,0))
             circle(current_copy,l2,20,(0,255,0))
             if count % 24 == 0:
-              print 'adding'
               proxy.prey_add_location(l1[0],l1[1])
               proxy.predator_add_location(l2[0],l2[1])
 
-          imshow('o',result)
           imshow('i',current_copy)
           #video.write(current_copy)
           if waitKey(1) ==27:
+            proxy.set_state('prey',0)
+            proxy.set_state('predator',0)
             exit(0)
 
         previous = current
