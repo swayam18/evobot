@@ -161,6 +161,10 @@ def track_loop():
   prev_locations = None
   while True:
     bytes+=stream.read(1024)
+    if bytes == "": 
+      proxy.set_state('prey',0)
+      proxy.set_state('predator',0)
+      break
     a = bytes.find('\xff\xd8')
     b = bytes.find('\xff\xd9')
     if a!=-1 and b!=-1:
