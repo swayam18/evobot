@@ -7,6 +7,7 @@ import kmeans
 import copy
 import time
 import manager
+import proxy
 
 # This code works perfectly!
 
@@ -159,6 +160,8 @@ def track_loop():
   current = None
   future = None
   prev_locations = None
+  proxy.set_state('prey',1)
+  proxy.set_state('predator',1)
   while True:
     bytes+=stream.read(1024)
     if bytes == "": 
@@ -203,6 +206,8 @@ def track_loop():
           l2 = tuple(map(int,prev_locations[1]))
           circle(current_copy,l1,20,(255,0,0))
           circle(current_copy,l2,20,(0,255,0))
+          proxy.prey_add_location(l1[0],l1[1])
+          proxy.predator_add_location(l2[0],l2[1])
 
         imshow('o',result)
         imshow('i',current_copy)
