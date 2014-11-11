@@ -155,7 +155,7 @@ def track_loop():
   #stream=urllib.urlopen('http://192.168.0.100/mjpeg.cgi')
   #stream=urllib.urlopen('http://71913554.cam.trendnetcloud.com/mjpeg.cgi')
   print 'opening'
-  stream=urllib.urlopen('http://192.168.28.102/mjpeg.cgi')
+  stream=urllib.urlopen('http://192.168.28.104/mjpeg.cgi')
   codec = cv.CV_FOURCC('M','J','P','G')
   #video = VideoWriter()
   filename = "recording_%d"%int(time.time())
