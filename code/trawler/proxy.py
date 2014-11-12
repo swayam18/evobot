@@ -18,7 +18,7 @@ def prey_add_location(x,y, remote=False):
   add_location('prey', x, y, remote)
 
 def predator_add_location(x,y, remote =False):
-  add_location('predator', x, y)
+  add_location('predator', x, y, remote)
 
 def add_location(name, x, y, remote=False):
   data = {}
@@ -30,7 +30,7 @@ def add_location(name, x, y, remote=False):
   thread.start()
   if remote:
     # also populate the remote server
-    remote_thread = threading.Thread(target=post, args=(url,data,))
+    remote_thread = threading.Thread(target=post, args=(remote_url,data,))
     remote_thread.start()
   return thread
 
@@ -41,8 +41,8 @@ def post(url,data):
   requests.post(url, json = data)
 
 if __name__ == '__main__':
-  prey_add_location(415,12, remote = True)
-  predator_add_location(11,12)
+  prey_add_location(941,192, remote = True)
+  predator_add_location(911,182)
   set_state("prey", 1)
   set_state("predator", 1)
   print "done"
