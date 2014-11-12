@@ -145,17 +145,17 @@ def map_pixel(location):
 def getLocation(prev,mu): 
   q = [ manager.Point(x,y) for x,y in mu]
   if prev == None: 
-    q = [manager.Point(0,0), manager.Point(100,100)]
+    q = [manager.Point(280,15), manager.Point(280,435)]
     return q
   else:
     return manager.map_points(prev,q) 
 
 def track_loop():
   #stream=urllib.urlopen('http://192.168.1.1/mjpeg.cgi')
-  #stream=urllib.urlopen('http://192.168.0.100/mjpeg.cgi')
   #stream=urllib.urlopen('http://71913554.cam.trendnetcloud.com/mjpeg.cgi')
+  #stream=urllib.urlopen('http://192.168.28.104/mjpeg.cgi')
   print 'opening'
-  stream=urllib.urlopen('http://192.168.28.104/mjpeg.cgi')
+  stream=urllib.urlopen('http://192.168.0.100/mjpeg.cgi')
   codec = cv.CV_FOURCC('M','J','P','G')
   #video = VideoWriter()
   filename = "recording_%d"%int(time.time())
