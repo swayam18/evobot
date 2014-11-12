@@ -145,7 +145,7 @@ def map_pixel(location):
 def getLocation(prev,mu): 
   q = [ manager.Point(x,y) for x,y in mu]
   if prev == None: 
-    q = [manager.Point(0,0), manager.Point(100,100)]
+    q = [manager.Point(280,15), manager.Point(280,435)]
     return q
   else:
     return manager.map_points(prev,q) 
@@ -163,7 +163,6 @@ def discover():
 
 def track_loop():
   #stream=urllib.urlopen('http://192.168.1.1/mjpeg.cgi')
-  #stream=urllib.urlopen('http://192.168.0.100/mjpeg.cgi')
   #stream=urllib.urlopen('http://71913554.cam.trendnetcloud.com/mjpeg.cgi')
   print 'Discovering Camera...'
   stream= discover()
