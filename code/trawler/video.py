@@ -150,12 +150,23 @@ def getLocation(prev,mu):
   else:
     return manager.map_points(prev,q) 
 
+def discover():
+  for i in range(100):
+    try:
+      url = "http://192.168.0.%d/mjpeg.cgi"%(100+i)
+      stream=urllib.urlopen(url)
+      print 'Camera Found!'
+      return stream
+    except IOError:
+      print 'Not camera: '+ url
+      continue
+
 def track_loop():
   #stream=urllib.urlopen('http://192.168.1.1/mjpeg.cgi')
   #stream=urllib.urlopen('http://192.168.0.100/mjpeg.cgi')
   #stream=urllib.urlopen('http://71913554.cam.trendnetcloud.com/mjpeg.cgi')
-  print 'opening'
-  stream=urllib.urlopen('http://192.168.28.104/mjpeg.cgi')
+  print 'Discovering Camera...'
+  stream= discover()
   codec = cv.CV_FOURCC('M','J','P','G')
   #video = VideoWriter()
   filename = "recording_%d"%int(time.time())
@@ -165,6 +176,14 @@ def track_loop():
   current = None
   future = None
   prev_locations = None
+  # test proxy
+  try:
+    print 'Searching for Rails server...'
+    proxy.test()
+  except proxy.requests.ConnectionError:
+    print 'rails server not found! open a new tab in the terminal and type "rails -s"'
+    return
+
   proxy.set_state('prey',1)
   proxy.set_state('predator',1)
 

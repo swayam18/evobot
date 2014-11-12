@@ -5,6 +5,9 @@ import cProfile
 root = "http://localhost:3000/robots/"
 #root = "http://evobot-proxy.herokuapp.com/robots/"
 
+def test():
+  requests.get(root)
+
 def set_state(name, state):
   data = {}
   url = root+name+'/'

@@ -1,8 +1,21 @@
 from cv2 import *
 import urllib
 import numpy as np
+import socket
 
-stream=urllib.urlopen('http://192.168.28.104/mjpeg.cgi')
+socket.setdefaulttimeout(3.0)
+
+def discover():
+  for i in range(100):
+    try:
+      url = "http://192.168.0.%d/mjpeg.cgi"%(100+i)
+      stream=urllib.urlopen(url)
+      return stream
+    except IOError:
+      print 'not'+ url
+      continue
+  
+stream = discover()
 bytes = ''
 
 while True:
