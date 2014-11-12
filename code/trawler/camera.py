@@ -3,7 +3,7 @@ import urllib
 import numpy as np
 import socket
 
-socket.setdefaulttimeout(3.0)
+socket.setdefaulttimeout(4.0)
 
 def discover():
   for i in range(100):
