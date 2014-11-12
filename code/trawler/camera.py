@@ -2,7 +2,7 @@ from cv2 import *
 import urllib
 import numpy as np
 
-stream=urllib.urlopen('http://192.168.28.102/mjpeg.cgi')
+stream=urllib.urlopen('http://192.168.28.104/mjpeg.cgi')
 bytes = ''
 
 while True:
