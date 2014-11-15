@@ -1,9 +1,8 @@
 from cv2 import *
-from sklearn.cluster import DBSCAN
 import urllib 
 import numpy as np
 import time
-import kmeans
+import kcluster
 import copy
 import time
 import manager
@@ -108,13 +107,9 @@ def means(contours):
       X.append((M['m10']/M['m00'],M['m01']/M['m00']))
     except ZeroDivisionError:
       print 'ZERO!'
-  if len(X):
-    #mu, clusters = kmeans.find_centers(X,ROBOTS_COUNT)
-    db = DBSCAN(eps=50, min_samples =7).fit(np.asarray(X))
-    labels = db.labels_
-    clusters = cluster_points(X,labels)
-    means = kmeans.reevaluate_centers(None, clusters)
-    
+  if len(X) >= 2:
+    means, clusters = kcluster.cluster(np.asarray(X), ROBOTS_COUNT, np.asarray(prev))
+
   return means, clusters
   
 def imcenters(contours):
@@ -161,6 +156,18 @@ def discover():
       print 'Not camera: '+ url
       continue
 
+# Given a binary image
+# It returns those points that are 'white'
+def point_cloud(img):
+  out = []
+  rows,cols = im1.shape
+  for i in range(rows):
+    out_row = []
+    for  j in range(cols):
+      if img[i][j] == 1:
+        print 'white'
+
+
 def track_loop():
   #stream=urllib.urlopen('http://192.168.1.1/mjpeg.cgi')
   #stream=urllib.urlopen('http://71913554.cam.trendnetcloud.com/mjpeg.cgi')
@@ -174,7 +181,7 @@ def track_loop():
   previous = None
   current = None
   future = None
-  prev_locations = None
+  prev_locations = [(280,15), (280,435)]
   # test proxy
   try:
     print 'Searching for Rails server...'
@@ -214,16 +221,13 @@ def track_loop():
           contours = imcontours(result) #get contour
           current_copy = copy.copy(current)
           if len(contours) != 0:
-            #imcenters(contours)
-            #drawbox(current_copy,contours)
             mu, clusters = means(contours) 
             if len(mu):
-              new_locations = getLocation(prev_locations,mu)
+              new_locations = mu
               prev_locations = new_locations
               for i,m in enumerate(mu):
                 m = tuple(map(int, m))
                 points = clusters[i]
-                #circle(current_copy,m,20,(255))
                 for p in points:
                   p = tuple(map(int, p))
                   circle(current_copy,p,2,(255))
@@ -278,4 +282,3 @@ def temp_test():
 #temp_test()
 track_loop()
 c = waitKey(0)
-
