@@ -112,7 +112,6 @@ def means(contours, prev):
       print 'ZERO!'
   if len(X) >= 2:
     means, clusters = kcluster.cluster(np.asarray(X), ROBOTS_COUNT, np.asarray(prev))
-    print means
     #km = KMeans(n_clusters = ROBOTS_COUNT,n_init=1, verbose=1, init=np.asarray(prev)).fit(np.asarray(X))
     #means = km.cluster_centers_
     #labels = km.labels_

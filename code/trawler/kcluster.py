@@ -31,13 +31,10 @@ def cluster(X, K, previous):
   mu = previous
   clusters = {}
   while not has_converged(mu, oldmu):
-    print 'hi'
     oldmu = mu
     # Assign all points in X to clusters
     clusters = cluster_points(X, mu)
     # Reevaluate centers
     mu = reevaluate_centers(oldmu, clusters)
-    print mu
-    print 'sadf'
   return(mu, clusters)
   

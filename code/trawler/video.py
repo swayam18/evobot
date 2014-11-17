@@ -181,7 +181,7 @@ def track_loop():
   previous = None
   current = None
   future = None
-  prev_locations = [(280,15), (280,435)]
+  prev_locations = [(30,230), (620,230)]
   # test proxy
   try:
     print 'Searching for Rails server...'
