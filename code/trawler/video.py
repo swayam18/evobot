@@ -238,7 +238,7 @@ def track_loop():
             circle(current_copy,l1,20,(255,0,0))
             circle(current_copy,l2,20,(0,255,0))
             if count % 24 == 0:
-              send_remote = count % (120) == 0
+              send_remote = count % (24 * 3) == 0
               proxy.prey_add_location(l1[0],l1[1], remote=send_remote)
               proxy.predator_add_location(l2[0],l2[1], remote=send_remote)
 
