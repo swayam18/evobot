@@ -97,7 +97,7 @@ def cluster_points(X,labels):
       clusters[c] = [x]
   return clusters
 
-def means(contours):
+def means(contours, prev):
   X = []
   means = []
   clusters = {}
@@ -221,7 +221,7 @@ def track_loop():
           contours = imcontours(result) #get contour
           current_copy = copy.copy(current)
           if len(contours) != 0:
-            mu, clusters = means(contours) 
+            mu, clusters = means(contours, prev_locations) 
             if len(mu):
               new_locations = mu
               prev_locations = new_locations
