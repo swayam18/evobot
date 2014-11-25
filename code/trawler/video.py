@@ -239,8 +239,12 @@ def track_loop():
             circle(current_copy,l2,20,(0,255,0))
             if count % 24 == 0:
               send_remote = count % (24 * 3) == 0
+              upload_remote = count % (24 * 300) == 0
               proxy.prey_add_location(l1[0],l1[1], remote=send_remote)
               proxy.predator_add_location(l2[0],l2[1], remote=send_remote)
+              if upload_remote:
+                imwrite("snapshot.jpg",current_copy)
+                proxy.upload_image("snapshot.jpg")
 
           imshow('i',current_copy)
           #video.write(current_copy)

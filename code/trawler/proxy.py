@@ -40,9 +40,20 @@ def put(url,data):
 def post(url,data):
   requests.post(url, json = data)
 
+def upload_image(image):
+  thread = threading.Thread(target=upload, args=(image,))
+  upload.start()
+  
+def upload(image):
+  url = "http://evobot-proxy.herokuapp.com/camera/"
+  files = {'snapshot': (image, open(image, 'rb'), 'image/jpg') }
+  requests.put(url, files=files)
+
 if __name__ == '__main__':
-  prey_add_location(941,192, remote = True)
-  predator_add_location(911,182)
-  set_state("prey", 1)
-  set_state("predator", 1)
-  print "done"
+  #prey_add_location(941,192, remote = True)
+  #predator_add_location(911,182)
+  #set_state("prey", 1)
+  #set_state("predator", 1)
+  #print "done"
+
+  upload("http://localhost:3000/camera/","result.jpg")
