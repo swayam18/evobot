@@ -42,7 +42,7 @@ def post(url,data):
 
 def upload_image(image):
   thread = threading.Thread(target=upload, args=(image,))
-  upload.start()
+  thread.start()
   
 def upload(image):
   url = "http://evobot-proxy.herokuapp.com/camera/"

@@ -243,6 +243,7 @@ def track_loop():
               proxy.prey_add_location(l1[0],l1[1], remote=send_remote)
               proxy.predator_add_location(l2[0],l2[1], remote=send_remote)
               if upload_remote:
+		print 'writing and uploading'
                 imwrite("snapshot.jpg",current_copy)
                 proxy.upload_image("snapshot.jpg")
 
