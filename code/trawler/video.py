@@ -8,6 +8,8 @@ import time
 import manager
 import proxy
 import socket
+import freeze
+import signal
 
 socket.setdefaulttimeout(5.0)
 
@@ -168,7 +170,7 @@ def point_cloud(img):
         print 'white'
 
 
-def track_loop():
+def track_loop(prev_locations= None):
   #stream=urllib.urlopen('http://192.168.1.1/mjpeg.cgi')
   #stream=urllib.urlopen('http://71913554.cam.trendnetcloud.com/mjpeg.cgi')
   print 'Discovering Camera...'
@@ -181,7 +183,7 @@ def track_loop():
   previous = None
   current = None
   future = None
-  prev_locations = [(30,230), (620,230)]
+  if prev_locations == None: prev_locations = [(30,230), (620,230)]
   # test proxy
   try:
     print 'Searching for Rails server...'
@@ -196,6 +198,7 @@ def track_loop():
   count = 0
   try: 
     while True:
+      signal.alarm(3) # check for camera freeze.
       bytes+=stream.read(1024)
       if bytes == "": 
         proxy.set_state('prey',0)
@@ -225,6 +228,7 @@ def track_loop():
             if len(mu):
               new_locations = mu
               prev_locations = new_locations
+              robot_locations = copy.copy(prev_locations)
               for i,m in enumerate(mu):
                 m = tuple(map(int, m))
                 points = clusters[i]
@@ -282,6 +286,17 @@ def temp_test():
   setTransformationMatrix()
   setAfflineMatrix()
   map_pixel([87, 73])
+
+
+def main_loop():
+  prev_locations = [(30,230), (620,230)]
+  signal.signal(signal.SIGALRM, freeze.handler)
+  while True:
+    try: 
+      track_loop(prev_locations)
+    except freeze.CameraFreezeException:
+      proxy.set_state('prey',0)
+      proxy.set_state('predator',0)
 
 #track()
 #temp_test()

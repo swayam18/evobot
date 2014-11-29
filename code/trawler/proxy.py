@@ -56,4 +56,4 @@ if __name__ == '__main__':
   #set_state("predator", 1)
   #print "done"
 
-  upload("http://localhost:3000/camera/","result.jpg")
+  upload("snapshot.jpg")
