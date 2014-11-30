@@ -268,6 +268,10 @@ def track_loop(prev_locations= None):
     print 'Camera Disappeared!'
     proxy.set_state('prey',0)
     proxy.set_state('predator',0)
+  except freeze.CameraFreezeException:
+    proxy.set_state('prey',0)
+    proxy.set_state('predator',0)
+    raise
 
 def track():
   previous = imread("0.jpg",0)
@@ -295,10 +299,11 @@ def main_loop():
     try: 
       track_loop(prev_locations)
     except freeze.CameraFreezeException:
+      print 'reseting camera'
       proxy.set_state('prey',0)
       proxy.set_state('predator',0)
 
 #track()
 #temp_test()
-track_loop()
+main_loop()
 c = waitKey(0)
