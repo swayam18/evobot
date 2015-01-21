@@ -10,10 +10,9 @@ import proxy
 import socket
 import freeze
 import signal
+from datetime import datetime
 
 socket.setdefaulttimeout(5.0)
-
-# This code works perfectly!
 
 TRANS_MATRIX = []
 AFFLINE_MATRIX = []
@@ -250,6 +249,8 @@ def track_loop(prev_locations= None):
 		print 'writing and uploading'
                 imwrite("snapshot.jpg",current_copy)
                 proxy.upload_image("snapshot.jpg")
+                filename = "snapshot" + datetime.now().strftime("%Y%m%d-%H%M%S")
+                imwrite("captures/" + filename, current_copy)
 
           imshow('i',current_copy)
           #video.write(current_copy)
@@ -261,6 +262,8 @@ def track_loop(prev_locations= None):
         previous = current
         current = future
         count+=1
+      else:
+        print 'waiting on better data'
 
     proxy.set_state('prey',0)
     proxy.set_state('predator',0)
