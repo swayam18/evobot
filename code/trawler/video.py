@@ -113,17 +113,6 @@ def means(contours, prev):
 
   return means, clusters
   
-def imcenters(contours):
-  print "Number of Robots Detected:",len(contours)
-  for contour in contours:
-    M = moments(contour)
-    try:
-      location =  M['m10']/M['m00'],M['m01']/M['m00']
-      #print "Location:", map_pixel(location)
-      print "Location:", location
-    except ZeroDivisionError:
-      print 'ZERO!'
-
 def drawbox(img,contours):
   for contour in contours:
     x,y,w,h = boundingRect(contour)
@@ -275,19 +264,6 @@ def track_loop(prev_locations= None):
     proxy.set_state('prey',0)
     proxy.set_state('predator',0)
     raise
-
-def track():
-  previous = imread("0.jpg",0)
-  current = imread("1.jpg",0)
-  future = imread("2.jpg",0)
-  s1 = subtract(current,previous)
-  s2 = subtract(future,current)
-  thmap = threshmap(s1,s2)
-  result = imfilter(thmap)
-  contours = imcontours(result)[0]
-  imcenters(contours)
-  drawbox(current,contours)
-  imwrite("tracked.jpg",current)
 
 def temp_test():
   setTransformationMatrix()
