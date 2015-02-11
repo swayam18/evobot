@@ -12,6 +12,7 @@ import socket
 import freeze
 import signal
 import interrupt
+from printer import *
 
 socket.setdefaulttimeout(5.0)
 
@@ -111,7 +112,7 @@ def means(contours, prev):
     try:
       X.append((M['m10']/M['m00'],M['m01']/M['m00']))
     except ZeroDivisionError:
-      print 'ZERO!'
+      pass
   if len(X) >= 2:
     means, clusters = kcluster.cluster(np.asarray(X), ROBOTS_COUNT, np.asarray(prev))
 
@@ -195,10 +196,12 @@ def track_loop(prev_locations= None):
       if bytes == "": 
         proxy.set_state('prey',0)
         proxy.set_state('predator',0)
+        print "stream ended!"
         break
       a = bytes.find('\xff\xd8')
       b = bytes.find('\xff\xd9')
       if a!=-1 and b!=-1:
+        Printer('processing frame: %d' % count)
         jpg = bytes[a:b+2]
         bytes= bytes[b+2:]
         i = imdecode(np.fromstring(jpg, dtype=np.uint8),0)
@@ -254,9 +257,6 @@ def track_loop(prev_locations= None):
         previous = current
         current = future
         count+=1
-      else:
-        print 'waiting on better data'
-
     proxy.set_state('prey',0)
     proxy.set_state('predator',0)
   except socket.timeout:
