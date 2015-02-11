@@ -2,6 +2,7 @@ from cv2 import *
 import urllib 
 import numpy as np
 import time
+import sys
 import kcluster
 import copy
 import time
@@ -10,13 +11,19 @@ import proxy
 import socket
 import freeze
 import signal
-from datetime import datetime
+import interrupt
 
 socket.setdefaulttimeout(5.0)
 
 TRANS_MATRIX = []
 AFFLINE_MATRIX = []
 ROBOTS_COUNT = 2
+
+def signal_handler(signal, frame):
+  print('Exit Detected... Setting proxy state...')
+  proxy.set_state('prey',0)
+  proxy.set_state('predator',0)
+  sys.exit(0)
 
 #set the transformation matrix
 def setTransformationMatrix():
@@ -36,9 +43,7 @@ def setAfflineMatrix():
 
 #Get the difference between images
 def subtract(current, background,dst="result.jpg"):
-  #subtracted = np.absolute(np.subtract(current,background))
   subtracted = absdiff(current, background)
-  #imwrite(dst, subtracted)
   return subtracted
 
 def fast_threshmap(im1, im2):
@@ -62,7 +67,6 @@ def threshmap(im1,im2,th_min = 20 , th_max = 230):
         out_row.append(0)
     out.append(out_row)
   out = np.uint8(out)
-  #imwrite("threshmap.jpg",out)
   return out
 
 # Improve the object recognized by threshmap using filters
@@ -182,7 +186,7 @@ def track_loop(prev_locations= None):
 
   proxy.set_state('prey',1)
   proxy.set_state('predator',1)
-
+  print 'rails server found... starting tracking'
   count = 0
   try: 
     while True:
@@ -236,10 +240,9 @@ def track_loop(prev_locations= None):
               proxy.predator_add_location(l2[0],l2[1], remote=send_remote)
               if upload_remote:
 		print 'writing and uploading'
-                imwrite("snapshot.jpg",current_copy)
+                filename= time.strftime("%Y%m%d-%H%M%S") + "-snap.jpg"
+                imwrite("snaps/"+filename,current_copy)
                 proxy.upload_image("snapshot.jpg")
-                filename = "snapshot" + datetime.now().strftime("%Y%m%d-%H%M%S")
-                imwrite("captures/" + filename, current_copy)
 
           imshow('i',current_copy)
           #video.write(current_copy)
@@ -284,5 +287,10 @@ def main_loop():
 
 #track()
 #temp_test()
+interrupt.listen()
+# ctrl c
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGHUP, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
 main_loop()
 c = waitKey(0)
