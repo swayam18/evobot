@@ -190,7 +190,7 @@ def track_loop(prev_locations= None):
   count = 0
   try: 
     while True:
-      signal.alarm(3) # check for camera freeze.
+      #signal.alarm(3) # check for camera freeze.
       bytes+=stream.read(1024)
       if bytes == "": 
         proxy.set_state('prey',0)
@@ -276,7 +276,7 @@ def temp_test():
 
 def main_loop():
   prev_locations = [(30,230), (620,230)]
-  signal.signal(signal.SIGALRM, freeze.handler)
+  #signal.signal(signal.SIGALRM, freeze.handler)
   while True:
     try: 
       track_loop(prev_locations)
@@ -289,8 +289,8 @@ def main_loop():
 #temp_test()
 interrupt.listen()
 # ctrl c
-signal.signal(signal.SIGINT, signal_handler)
-signal.signal(signal.SIGHUP, signal_handler)
-signal.signal(signal.SIGTERM, signal_handler)
+#signal.signal(signal.SIGINT, signal_handler)
+#signal.signal(signal.SIGHUP, signal_handler)
+#signal.signal(signal.SIGTERM, signal_handler)
 main_loop()
 c = waitKey(0)
