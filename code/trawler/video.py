@@ -167,15 +167,13 @@ def point_cloud(img):
 
 
 def track_loop(prev_locations= None):
-  #stream=urllib.urlopen('http://192.168.1.1/mjpeg.cgi')
-  #stream=urllib.urlopen('http://71913554.cam.trendnetcloud.com/mjpeg.cgi')
   print 'Discovering Camera...'
   stream= discover()
   codec = cv.CV_FOURCC('M','J','P','G')
   #video = VideoWriter()
   filename = "recording_%d"%int(time.time())
   #video.open(filename, codec, 24, (640,480),False)
-  bytes=''
+  data=''
   previous = None
   current = None
   future = None
@@ -195,18 +193,18 @@ def track_loop(prev_locations= None):
   try: 
     while True:
       #signal.alarm(3) # check for camera freeze.
-      bytes+=stream.read(1024)
-      if bytes == "": 
+      data+=stream.read(1024)
+      if data == "": 
         proxy.set_state('prey',0)
         proxy.set_state('predator',0)
         print "stream ended!"
         break
-      a = bytes.find('\xff\xd8')
-      b = bytes.find('\xff\xd9')
+      a = data.find('\xff\xd8')
+      b = data.find('\xff\xd9')
       if a!=-1 and b!=-1:
         Printer('processing frame: %d' % count)
-        jpg = bytes[a:b+2]
-        bytes= bytes[b+2:]
+        jpg = data[a:b+2]
+        data= data[b+2:]
         i = imdecode(np.fromstring(jpg, dtype=np.uint8),0)
         future = i
         if previous == None or current == None or future == None:
@@ -260,6 +258,8 @@ def track_loop(prev_locations= None):
         previous = current
         current = future
         count+=1
+      else:
+        Printer('buffering... buffered frames:' % len(data)/ 1024)
     proxy.set_state('prey',0)
     proxy.set_state('predator',0)
   except socket.timeout:
