@@ -260,7 +260,9 @@ def track_loop(prev_locations= None):
         current = future
         count+=1
       else:
-        Printer('buffering... buffered frames:%d' % len(data)/ 1024)
+        buffered_frames = (len(data))/1024
+        if buffered_frames > 16:
+          Printer('buffering... buffered frames: %d' % (len(data)/ 1024))
     proxy.set_state('prey',0)
     proxy.set_state('predator',0)
   except socket.timeout:
