@@ -193,8 +193,9 @@ def track_loop(prev_locations= None):
   try: 
     while True:
       #signal.alarm(3) # check for camera freeze.
-      data+=stream.read(1024)
-      if data == "": 
+      new_data =stream.read(1024)
+      data += new_data
+      if new_data == "": 
         proxy.set_state('prey',0)
         proxy.set_state('predator',0)
         print "stream ended!"
