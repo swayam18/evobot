@@ -12,9 +12,10 @@ import socket
 import freeze
 import signal
 import interrupt
+import pdb
 from printer import *
 
-socket.setdefaulttimeout(5.0)
+socket.setdefaulttimeout(5000.0)
 
 TRANS_MATRIX = []
 AFFLINE_MATRIX = []
@@ -24,6 +25,8 @@ def signal_handler(signal, frame):
   print('Exit Detected... Setting proxy state...')
   proxy.set_state('prey',0)
   proxy.set_state('predator',0)
+  print('Opening Debugger...')
+  pdb.set_trace()
   sys.exit(0)
 
 #set the transformation matrix
@@ -245,7 +248,7 @@ def track_loop(prev_locations= None):
 		print 'writing and uploading'
                 filename= time.strftime("%Y%m%d-%H%M%S") + "-snap.jpg"
                 imwrite("snaps/"+filename,current_copy)
-                proxy.upload_image("snapshot.jpg")
+                proxy.upload_image("snaps/"+filename)
 
           imshow('i',current_copy)
           #video.write(current_copy)
@@ -289,7 +292,7 @@ def main_loop():
 #temp_test()
 interrupt.listen()
 # ctrl c
-#signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGINT, signal_handler)
 #signal.signal(signal.SIGHUP, signal_handler)
 #signal.signal(signal.SIGTERM, signal_handler)
 main_loop()
